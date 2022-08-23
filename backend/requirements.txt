@@ -6,4 +6,4 @@ pytorch-lightning
 numpy
 omegaconf
 tqdm
--e git+https://github.com/CompVis/stable-diffusion.git@main#egg=ldm
+-e git+https://github.com/CompVis/stable-diffusion.git@main#egg=latent-diffusion
