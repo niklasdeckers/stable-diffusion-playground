@@ -168,7 +168,7 @@ const App = ({ classes }) => {
                                         </MenuItem>
                                     })}
                                 </Select>
-                                <FormHelperText>More images = More time to generate</FormHelperText>
+                                <FormHelperText>More images = More time to generate<br /><a href="https://huggingface.co/spaces/CompVis/stable-diffusion-license">License</a></FormHelperText>
                             </FormControl>
                         </CardContent>
                     </Card>
