@@ -15,9 +15,6 @@ RUN apt-get install -y git
 # update pip
 RUN pip3 install --upgrade pip
 
-# install jax
-RUN pip3 install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda11.cudnn805-cp38-none-manylinux2014_x86_64.whl
-
 # add requirements
 COPY ./requirements.txt /app/requirements.txt
 
@@ -28,4 +25,4 @@ RUN pip3 install -r requirements.txt
 COPY . /app
 
 # run server
-CMD python3 app.py --port 8080 --model_version mega
+CMD python3 app.py --port 8080 --model_path "./model.ckpt"

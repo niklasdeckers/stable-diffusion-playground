@@ -1,6 +1,3 @@
-from consts import ModelSize
-
-
 def parse_arg_boolean(value):
     value = value.lower()
 
@@ -10,7 +7,3 @@ def parse_arg_boolean(value):
         return False
 
     return False
-
-def parse_arg_dalle_version(value):
-    value = value.lower()
-    return ModelSize[value.upper()]
