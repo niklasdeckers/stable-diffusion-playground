@@ -81,7 +81,7 @@ const App = ({ classes }) => {
     const validBackendUrl = isValidBackendEndpoint && backendUrl
 
     function enterPressedCallback(promptText) {
-        console.log('API call to DALL-E web service with the following prompt [' + promptText + ']');
+        console.log('API call to txt2img web service with the following prompt [' + promptText + ']');
         setApiError('')
         setIsFetchingImgs(true)
         callDalleService(backendUrl, promptText, imagesPerQuery).then((response) => {
@@ -92,7 +92,7 @@ const App = ({ classes }) => {
 
             if (notificationsOn) {
                 new Notification(
-                    "Your DALL-E images are ready!",
+                    "Your images are ready!",
                     {
                         body: `Your generations for "${promptText}" are ready to view`,
                         icon: NOTIFICATION_ICON,
@@ -100,11 +100,11 @@ const App = ({ classes }) => {
                 )
             }
         }).catch((error) => {
-            console.log('Error querying DALL-E service.', error)
+            console.log('Error querying txt2img service.', error)
             if (error.message === 'Timeout') {
-                setApiError('Timeout querying DALL-E service (>1min). Consider reducing the images per query or use a stronger backend.')
+                setApiError('Timeout querying txt2img service (>1min). Consider reducing the images per query or use a stronger backend.')
             } else {
-                setApiError('Error querying DALL-E service. Check your backend server logs.')
+                setApiError('Error querying txt2img service. Check your backend server logs.')
             }
             setIsFetchingImgs(false)
         })
@@ -127,13 +127,13 @@ const App = ({ classes }) => {
         <div className={classes.root}>
             <div className={classes.title}>
                 <Typography variant="h3">
-                    DALL-E Playground <span role="img" aria-label="sparks-emoji">✨</span>
+                    txt2img Playground <span role="img" aria-label="sparks-emoji">✨</span>
                 </Typography>
             </div>
 
             {!validBackendUrl && <div>
                 <Typography variant="body1" color="textSecondary">
-                    Put your DALL-E backend URL to start
+                    Put your txt2img backend URL to start
                 </Typography>
             </div>}
 
