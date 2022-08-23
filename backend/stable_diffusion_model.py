@@ -61,7 +61,7 @@ class Model:
         start_code = None
         if self.opt.fixed_code:
             start_code = torch.randn(
-                [self.opt.n_samples, self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f],
+                [n_samples, self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f],
                 device=self.device)
 
         precision_scope = autocast if self.opt.precision == "autocast" else nullcontext
