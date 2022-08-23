@@ -89,6 +89,7 @@ class Model:
                         x_samples_ddim = self.model.decode_first_stage(samples_ddim)
                         x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
                         x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
-                        all_samples.append(Image.fromarray(np.asarray(x_samples_ddim * 255, dtype=np.uint8)))
+                        for each in x_samples_ddim:
+                            all_samples.append(Image.fromarray(np.asarray(each * 255, dtype=np.uint8)))
 
         return all_samples
