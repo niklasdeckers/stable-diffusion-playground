@@ -7,3 +7,24 @@ numpy
 omegaconf
 tqdm
 -e git+https://github.com/CompVis/stable-diffusion.git@main#egg=latent-diffusion
+Pillow
+torch
+torchvision
+albumentations
+diffusers
+opencv-python
+pudb
+invisible-watermark
+imageio
+imageio-ffmpeg
+pytorch-lightning
+omegaconf
+test-tube>=0.7.5
+streamlit>=0.73.1
+einops
+torch-fidelity
+transformers
+torchmetrics
+kornia
+-e git+https://github.com/CompVis/taming-transformers.git@master#egg=taming-transformers
+-e git+https://github.com/openai/CLIP.git@main#egg=clip
