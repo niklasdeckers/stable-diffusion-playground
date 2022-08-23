@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.2.2-cudnn8-devel-ubuntu20.04
+FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
 
 # expose
 EXPOSE 8080
