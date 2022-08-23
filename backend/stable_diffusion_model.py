@@ -7,7 +7,6 @@ from PIL import Image
 from omegaconf import OmegaConf
 from pytorch_lightning import seed_everything
 from torch import autocast
-from tqdm import trange
 
 from ldm.models.diffusion.plms import PLMSSampler
 
@@ -46,7 +45,7 @@ class Model:
                "scale": 7.5,
                "precision": "autocast",
                "fixed_code": True,
-               "n_iter": 2
+               "n_iter": 1
                }
         self.opt = collections.namedtuple("opt", opt.keys())(**opt)
         config = OmegaConf.load("v1-inference.yaml")
@@ -69,7 +68,7 @@ class Model:
             with precision_scope("cuda"):
                 with self.model.ema_scope():
                     all_samples = list()
-                    for n in trange(self.opt.n_iter, desc="Sampling"):
+                    for n in range(self.opt.n_iter):  # sampling
                         uc = None
                         if self.opt.scale != 1.0:
                             uc = self.model.get_learned_conditioning(n_samples * [""])
