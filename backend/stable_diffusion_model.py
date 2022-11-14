@@ -1,5 +1,6 @@
 import collections
 from contextlib import nullcontext
+import threading
 
 import numpy as np
 import torch
@@ -53,42 +54,43 @@ class Model:
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.model = model.to(self.device)
         self.sampler = PLMSSampler(model)
+        self.queue_lock = threading.Lock()
 
     def generate_images(self, text_prompt, n_samples):
         # from https://github.com/CompVis/stable-diffusion/blob/69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc/scripts/txt2img.py
+        with self.queue_lock:
+            start_code = None
+            if self.opt.fixed_code:
+                start_code = torch.randn(
+                    [n_samples, self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f],
+                    device=self.device)
 
-        start_code = None
-        if self.opt.fixed_code:
-            start_code = torch.randn(
-                [n_samples, self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f],
-                device=self.device)
+            precision_scope = autocast if self.opt.precision == "autocast" else nullcontext
+            with torch.no_grad():
+                with precision_scope("cuda"):
+                    with self.model.ema_scope():
+                        all_samples = list()
+                        for n in range(self.opt.n_iter):  # sampling
+                            uc = None
+                            if self.opt.scale != 1.0:
+                                uc = self.model.get_learned_conditioning(n_samples * [""])
+                            prompts = [text_prompt] * n_samples
+                            c = self.model.get_learned_conditioning(prompts)
+                            shape = [self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f]
+                            samples_ddim, _ = self.sampler.sample(S=self.opt.ddim_steps,
+                                                                  conditioning=c,
+                                                                  batch_size=n_samples,
+                                                                  shape=shape,
+                                                                  verbose=False,
+                                                                  unconditional_guidance_scale=self.opt.scale,
+                                                                  unconditional_conditioning=uc,
+                                                                  eta=self.opt.ddim_eta,
+                                                                  x_T=start_code)
 
-        precision_scope = autocast if self.opt.precision == "autocast" else nullcontext
-        with torch.no_grad():
-            with precision_scope("cuda"):
-                with self.model.ema_scope():
-                    all_samples = list()
-                    for n in range(self.opt.n_iter):  # sampling
-                        uc = None
-                        if self.opt.scale != 1.0:
-                            uc = self.model.get_learned_conditioning(n_samples * [""])
-                        prompts = [text_prompt] * n_samples
-                        c = self.model.get_learned_conditioning(prompts)
-                        shape = [self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f]
-                        samples_ddim, _ = self.sampler.sample(S=self.opt.ddim_steps,
-                                                              conditioning=c,
-                                                              batch_size=n_samples,
-                                                              shape=shape,
-                                                              verbose=False,
-                                                              unconditional_guidance_scale=self.opt.scale,
-                                                              unconditional_conditioning=uc,
-                                                              eta=self.opt.ddim_eta,
-                                                              x_T=start_code)
+                            x_samples_ddim = self.model.decode_first_stage(samples_ddim)
+                            x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
+                            x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
+                            for each in x_samples_ddim:
+                                all_samples.append(Image.fromarray(np.asarray(each * 255, dtype=np.uint8)))
 
-                        x_samples_ddim = self.model.decode_first_stage(samples_ddim)
-                        x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
-                        x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
-                        for each in x_samples_ddim:
-                            all_samples.append(Image.fromarray(np.asarray(each * 255, dtype=np.uint8)))
-
-        return all_samples
+            return all_samples
