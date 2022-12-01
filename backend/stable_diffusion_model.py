@@ -56,11 +56,13 @@ class Model:
         self.sampler = PLMSSampler(model)
         self.queue_lock = threading.Lock()
 
-    def generate_images(self, text_prompt, n_samples):
+    def generate_images(self, text_prompt, n_samples, seed = -1):
         # from https://github.com/CompVis/stable-diffusion/blob/69ae4b35e0a0f6ee1af8bb9a5d0016ccb27e36dc/scripts/txt2img.py
         with self.queue_lock:
             start_code = None
             if self.opt.fixed_code:
+                if seed != -1:
+                    torch.manual_seed(seed)
                 start_code = torch.randn(
                     [n_samples, self.opt.C, self.opt.H // self.opt.f, self.opt.W // self.opt.f],
                     device=self.device)
