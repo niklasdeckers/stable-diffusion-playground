@@ -33,7 +33,8 @@ def generate_images_api():
     json_data = request.get_json(force=True)
     text_prompt = json_data["text"]
     num_images = json_data["num_images"]
-    generated_imgs = model.generate_images(text_prompt, num_images)
+    seed = json_data.get("seed", -1)
+    generated_imgs = model.generate_images(text_prompt, num_images, seed)
 
     returned_generated_images = []
     if args.save_to_disk:
