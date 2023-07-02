@@ -7,7 +7,7 @@ EXPOSE 8080
 WORKDIR /app
 
 # install git, the c compiler for compiling the model, and cv2 dependencies
-RUN apt-get update && apt-get install -y git build-essential install ffmpeg libsm6 libxext6
+RUN apt-get update && apt-get install -y git build-essential ffmpeg libsm6 libxext6
 
 # add requirements
 COPY ./requirements.txt /app/requirements.txt
