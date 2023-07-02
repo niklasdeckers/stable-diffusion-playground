@@ -1,7 +1,7 @@
 Flask==2.1.0
 Flask-Cors==3.0.9
 Flask-RESTful==0.3.8
--e git+https://github.com/huggingface/diffusers.git@sd_xl
+git+https://github.com/huggingface/diffusers.git@sd_xl
 transformers
 accelerate
 safetensors
